@@ -6,15 +6,26 @@
 import Joi from 'joi';
 
 export const PostModel = Joi.object({
-  user_id: Joi.string(),
-  hashtag_id: Joi.string(),
+  userId: Joi.string(),
+  hashtagId: Joi.string(),
   text: Joi.string(),
-  image_uri: Joi.string(),
+  imageURL: Joi.string(),
+  isPublic: Joi.bool().default(false),
+  likeCount: Joi.number().default(0),
+  likedBy: Joi.array().items(Joi.string()).default([])
 }).required();
 
 export const PostModelRequired = Joi.object({
-  user_id: Joi.string().required(),
-  hashtag_id: Joi.string(),
+  userId: Joi.string().required(),
+  hashtagId: Joi.string(),
   text: Joi.string().required(),
-  image_uri: Joi.string(),
+  imageURL: Joi.string(),
+  isPublic: Joi.bool().default(false),
+  likeCount: Joi.number().default(0),
+  likedBy: Joi.array().items(Joi.string()).default([])
 }).required();
+
+export const LikeUnlikeModel = Joi.object({
+  userId: Joi.string().required()
+}).required();
+

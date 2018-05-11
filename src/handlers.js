@@ -9,7 +9,8 @@ import {
 class Handlers {
   @ReplyPromiseResponse
   static getAllPosts(request) {
-    return r.table(env.DB_TABLE_NAME)
+    const {skip, limit} = request.query;
+    return r.table(env.DB_TABLE_NAME).skip(skip).limit(limit)
   }
 
   @ReplyPromiseResponse
@@ -48,6 +49,34 @@ class Handlers {
     return r.table(env.DB_TABLE_NAME)
     .get(postId)
     .update(payload, {returnChanges: true})
+  }
+
+  @ReplyPromiseResponse
+  static likePost(request) {
+    const { postId } = request.params;
+    const { payload: { userId } } = request;
+
+    return r.table(env.DB_TABLE_NAME)
+      .get(postId)
+      .update({
+          likedBy: r.row('likedBy').append(userId),
+          likeCount: r.row('likeCount').add(1)
+      }, {returnChanges: true})
+  }
+
+  @ReplyPromiseResponse
+  static unlikePost(request) {
+    const { postId } = request.params;
+    const { payload: { userId } } = request;
+    
+    return r.table(env.DB_TABLE_NAME)
+    .get(postId).update(function (row)  {
+      return {
+        'likedBy': row('likedBy')
+          .filter(function (item) { return item.ne(userId) }),
+        'likeCount': row('likeCount').sub(1)
+      }
+    }, {returnChanges: true})
   }
 
   @ReplyPromiseResponse

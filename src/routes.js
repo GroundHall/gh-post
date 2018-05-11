@@ -1,15 +1,26 @@
+import Joi from 'joi';
 import Handlers from './handlers';
 
 import {
   PostModel,
-  PostModelRequired
+  PostModelRequired,
+  LikeUnlikeModel
 } from './db/model';
 
 const routes = [
   {
     method: 'GET',
     path: '/posts',
-    handler: Handlers.getAllPosts
+    handler: Handlers.getAllPosts,
+    config: {
+      validate: {
+        query: {
+          limit: Joi.number().integer().min(1).max(100)
+            .default(10),
+          skip: Joi.number().integer().min(0).default(0)
+        }
+      }
+    }
   },
   {
     method: 'GET',
@@ -43,6 +54,26 @@ const routes = [
     config: {
       validate: {
         payload: PostModel
+      }
+    }
+  },
+  {
+    method: 'PATCH',
+    path: '/posts/{postId}/like',
+    handler: Handlers.likePost,
+    config: {
+      validate: {
+        payload: LikeUnlikeModel
+      }
+    }
+  },
+  {
+    method: 'PATCH',
+    path: '/posts/{postId}/unlike',
+    handler: Handlers.unlikePost,
+    config: {
+      validate: {
+        payload: LikeUnlikeModel
       }
     }
   },
